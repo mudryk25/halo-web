@@ -44,6 +44,18 @@
   to { transform: translateY(0); }
 }
 
+/* For 3× repeated content — moves one copy-height upward then loops seamlessly */
+@keyframes scrollUpThird {
+  from { transform: translateY(0); }
+  to { transform: translateY(-33.333%); }
+}
+
+/* Opposite direction — moves one copy-height downward then loops seamlessly */
+@keyframes scrollDownThird {
+  from { transform: translateY(-33.333%); }
+  to { transform: translateY(0); }
+}
+
 html {
   scroll-behavior: smooth;
 }

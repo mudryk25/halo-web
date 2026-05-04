@@ -18,9 +18,7 @@ const storiesCol2 = [
 
 const StoryCard = ({ story }: { story: any }) => (
   <div className="w-[200px] md:w-[240px] lg:w-[260px] xl:w-[300px] flex-shrink-0 rounded-3xl bg-[#2b6496]/40 backdrop-blur-md border border-white/10 p-6 flex flex-col gap-4 text-white shadow-2xl mb-6 mx-auto relative overflow-hidden pointer-events-auto">
-    {/* Dot pattern background */}
     <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '8px 8px' }}></div>
-    
     <div className="relative z-10 flex flex-col h-full gap-4">
       <h3 className="font-serif text-2xl font-bold tracking-wide">{story.source}</h3>
       <div className="border-t border-dotted border-white/20 w-full" />
@@ -37,69 +35,86 @@ const StoryCard = ({ story }: { story: any }) => (
 export default function MissionStories() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
-  const leftColRef = useRef<HTMLDivElement>(null);
-  const rightColRef = useRef<HTMLDivElement>(null);
+  const storiesContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let ctx: gsap.Context;
 
     const initAnimation = () => {
-      // Small timeout to ensure DOM layout has fully settled and Hero pin padding is active
       setTimeout(() => {
         if (ctx) ctx.revert();
 
+        const aboutSection = document.querySelector('#about');
+
         ctx = gsap.context(() => {
+          // === TEXT: Line-by-line left-to-right reveal ===
+          const words = gsap.utils.toArray('.highlight-word', textRef.current) as HTMLElement[];
+          const containerTop = textRef.current!.getBoundingClientRect().top;
+
+          // Group words by visual line (round to nearest 4px for subpixel stability)
+          const lineMap = new Map<number, HTMLElement[]>();
+          words.forEach(word => {
+            const lineKey = Math.round((word.getBoundingClientRect().top - containerTop) / 4) * 4;
+            if (!lineMap.has(lineKey)) lineMap.set(lineKey, []);
+            lineMap.get(lineKey)!.push(word);
+          });
+
+          const lines = [...lineMap.entries()]
+            .sort(([a], [b]) => a - b)
+            .map(([_, lineWords]) => lineWords);
+
           const tl = gsap.timeline({
             scrollTrigger: {
               trigger: sectionRef.current,
-              start: 'top bottom', // Start instantly entering screen
-              end: 'bottom top',   // Leave screen naturally
-              scrub: 1, // Smooth scrub
+              start: 'top 70%',
+              end: 'bottom 30%',
+              scrub: 1,
               invalidateOnRefresh: true,
             }
           });
 
-          // Parallax background columns
-          // We set duration to 1.5 to exactly match the text highlight timeline (duration 1 + stagger 0.5)
-          // This ensures the parallax continues smoothly for the entire time the section is in view
-          // The cards should start high (negative Y) and move down (positive Y)
-          if (leftColRef.current) {
-            tl.fromTo(leftColRef.current, 
-              { y: '-50vh' }, 
-              { y: '30vh', ease: 'none', duration: 1.5 }, 
-              0
-            );
-          }
-          if (rightColRef.current) {
-            tl.fromTo(rightColRef.current, 
-              { y: '-50vh' }, 
-              { y: '30vh', ease: 'none', duration: 1.5 }, 
-              0
-            );
-          }
+          // Each line gets an equal slice of the timeline.
+          // Within each slice: stagger fills 60% (left-to-right), each word's fade fills 40%.
+          lines.forEach((lineWords, i) => {
+            const sliceStart = i / lines.length;
+            const sliceDuration = 1 / lines.length;
 
-          // Text Highlighting
-          const words = gsap.utils.toArray('.highlight-word', textRef.current);
-          tl.fromTo(words, 
-            { color: 'rgba(255, 255, 255, 0.3)' }, 
-            {
-              color: 'rgba(255, 255, 255, 1)',
-              stagger: { amount: 0.5 },
-              duration: 1, 
-              ease: 'none',
-            },
-            0 
-          );
+            tl.fromTo(lineWords,
+              { color: 'rgba(255, 255, 255, 0.3)' },
+              {
+                color: 'rgba(255, 255, 255, 1)',
+                stagger: { amount: sliceDuration * 0.6, from: 'start' },
+                duration: sliceDuration * 0.4,
+                ease: 'none',
+              },
+              sliceStart
+            );
+          });
+
+          // === STORIES: CSS animation handles the loop; GSAP only controls visibility ===
+          // Fade in when mission enters view; fade out when scrolling back above mission
+          ScrollTrigger.create({
+            trigger: sectionRef.current,
+            start: 'top bottom',
+            onEnter: () => gsap.to(storiesContainerRef.current, { opacity: 1, duration: 0.6 }),
+            onLeaveBack: () => gsap.to(storiesContainerRef.current, { opacity: 0, duration: 0.6 }),
+          });
+
+          // Fade out when About section enters view; fade back in when scrolling back above it
+          ScrollTrigger.create({
+            trigger: aboutSection,
+            start: 'top bottom',
+            onEnter: () => gsap.to(storiesContainerRef.current, { opacity: 0, duration: 0.6 }),
+            onLeaveBack: () => gsap.to(storiesContainerRef.current, { opacity: 1, duration: 0.6 }),
+          });
 
           ScrollTrigger.refresh();
         }, sectionRef);
       }, 50);
     };
 
-    // Fix Race Condition: Wait for Hero video to pin before calculating Mission boundaries
     window.addEventListener('hero-pin-ready', initAnimation, { once: true });
 
-    // Fallback in case the event fired before we mounted
     const fallbackTimer = setTimeout(() => {
       if (!ctx) initAnimation();
     }, 500);
@@ -121,39 +136,46 @@ export default function MissionStories() {
   ];
 
   return (
-    <section ref={sectionRef} className="relative w-full min-h-[100svh] py-20 md:py-32 border-y border-transparent overflow-hidden flex items-center justify-center">
-      
-      {/* Background Scrolling Columns */}
-      <div 
-        className="absolute inset-0 flex justify-between items-center w-full px-2 md:px-4 lg:px-8 pointer-events-none opacity-20 md:opacity-40 lg:opacity-100 z-0"
+    <section ref={sectionRef} className="relative w-full min-h-[100svh] py-20 md:py-32 border-y border-transparent flex items-center justify-center">
+
+      {/* Story columns fixed to the full viewport — CSS animation drives the infinite loop */}
+      <div
+        ref={storiesContainerRef}
+        className="fixed inset-0 flex justify-between items-start w-full px-2 md:px-4 lg:px-8 pointer-events-none overflow-hidden z-[5]"
         style={{
+          opacity: 0,
           maskImage: 'linear-gradient(to bottom, transparent, black 10%, black 90%, transparent)',
-          WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 10%, black 90%, transparent)'
+          WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 10%, black 90%, transparent)',
         }}
       >
-        {/* Left Column (scrolls up) */}
-        <div ref={leftColRef} className="hidden sm:flex flex-col relative gap-6 flex-shrink-0">
+        {/* Left column — loops every 16s */}
+        <div
+          className="hidden sm:flex flex-col gap-6 flex-shrink-0"
+          style={{ animation: 'scrollUpThird 16s linear infinite' }}
+        >
           {[...storiesCol1, ...storiesCol1, ...storiesCol1].map((story, i) => (
             <StoryCard key={`l-${i}`} story={story} />
           ))}
         </div>
 
-        {/* Right Column (scrolls down) */}
-        <div ref={rightColRef} className="hidden sm:flex flex-col relative gap-6 flex-shrink-0">
+        {/* Right column — loops every 22s, offset by half a cycle so they're out of phase */}
+        <div
+          className="hidden sm:flex flex-col gap-6 flex-shrink-0"
+          style={{ animation: 'scrollDownThird 22s linear infinite -11s' }}
+        >
           {[...storiesCol2, ...storiesCol2, ...storiesCol2].map((story, i) => (
             <StoryCard key={`r-${i}`} story={story} />
           ))}
         </div>
       </div>
 
-      <div className="mx-auto px-4 w-full flex items-center justify-center relative z-20 
-        max-w-[95%] 
-        md:max-w-xl 
-        lg:max-w-[calc(100vw-620px)] 
-        xl:max-w-[calc(100vw-760px)] 
+      <div className="mx-auto px-4 w-full flex items-center justify-center relative z-20
+        max-w-[95%]
+        md:max-w-xl
+        lg:max-w-[calc(100vw-620px)]
+        xl:max-w-[calc(100vw-760px)]
         2xl:max-w-[900px]
       ">
-        {/* Center Column - Mission Text */}
         <div className="flex flex-col justify-center items-center relative p-2 sm:p-6" ref={textRef}>
           <div className="space-y-6 md:space-y-8 text-center">
             <h2 className="text-4xl md:text-5xl xl:text-6xl font-serif text-white mb-6 md:mb-12">Our Mission</h2>

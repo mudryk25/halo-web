@@ -23,39 +23,40 @@ import MissionStories from "../components/MissionStories";
 
     <main class="relative z-20">
       <Navbar />
-      <!-- Content Sections Below Video -->
-      <div>
-        <!-- Hero CTA Section -->
-        <div id="hero-section" class="h-svh w-full flex items-center justify-center px-4 md:px-10">
-          <div id="hero-content" class="max-w-5xl w-full text-center space-y-16">
-            <div class="space-y-6">
-              <h2 class="text-5xl md:text-[5.5rem] font-serif leading-[1.1] tracking-tight">
-                Because Your <br class="hidden md:block"/> Safety Matters
-              </h2>
-              <p class="text-xl md:text-2xl text-white/60 font-light max-w-xl mx-auto leading-relaxed">
-                Giving you the confidence to move <br class="hidden md:block"/> 
-                through the world without hesitation.
-              </p>
-            </div>
-            
-            <div class="relative inline-flex items-center justify-center">
-              <!-- Glowing layers hugging the borders -->
-              <div class="absolute -inset-[3px] rounded-xl bg-white/90 blur-md animate-pulse" style="animation-duration: 2s;"></div>
-              <div class="absolute -inset-[10px] rounded-xl bg-white/60 blur-xl animate-pulse" style="animation-duration: 3s; animation-delay: 0.5s;"></div>
-              <div class="absolute -inset-[20px] rounded-xl bg-white/30 blur-2xl animate-pulse" style="animation-duration: 4s; animation-delay: 1s;"></div>
-              
-              <WaitlistButton
-                className="relative bg-white text-black py-4 px-10 text-lg md:text-xl font-bold rounded-xl shadow-[0_0_25px_rgba(255,255,255,0.8)] hover:shadow-[0_0_50px_rgba(255,255,255,1)] hover:scale-[1.03] active:scale-95 transition-all duration-300 font-serif inline-block cursor-pointer"
-                client:load
-                isHeroButton={true}
-              >
-                Make the world safer
-              </WaitlistButton>
-            </div>
+
+      <!-- Hero CTA Section — no background so the video shows through -->
+      <div id="hero-section" class="h-svh w-full flex items-center justify-center px-4 md:px-10">
+        <div id="hero-content" class="max-w-5xl w-full text-center space-y-16">
+          <div class="space-y-6">
+            <h2 class="text-5xl md:text-[5.5rem] font-serif leading-[1.1] tracking-tight">
+              Because Your <br class="hidden md:block"/> Safety Matters
+            </h2>
+            <p class="text-xl md:text-2xl text-white/60 font-light max-w-xl mx-auto leading-relaxed">
+              Giving you the confidence to move <br class="hidden md:block"/>
+              through the world without hesitation.
+            </p>
+          </div>
+
+          <div class="relative inline-flex items-center justify-center">
+            <!-- Glowing layers hugging the borders -->
+            <div class="absolute -inset-[3px] rounded-xl bg-white/90 blur-md animate-pulse" style="animation-duration: 2s;"></div>
+            <div class="absolute -inset-[10px] rounded-xl bg-white/60 blur-xl animate-pulse" style="animation-duration: 3s; animation-delay: 0.5s;"></div>
+            <div class="absolute -inset-[20px] rounded-xl bg-white/30 blur-2xl animate-pulse" style="animation-duration: 4s; animation-delay: 1s;"></div>
+
+            <WaitlistButton
+              className="relative bg-white text-black py-4 px-10 text-lg md:text-xl font-bold rounded-xl shadow-[0_0_25px_rgba(255,255,255,0.8)] hover:shadow-[0_0_50px_rgba(255,255,255,1)] hover:scale-[1.03] active:scale-95 transition-all duration-300 font-serif inline-block cursor-pointer"
+              client:load
+              isHeroButton={true}
+            >
+              Make the world safer
+            </WaitlistButton>
           </div>
         </div>
+      </div>
 
-        <!-- Spacer for blank blue screen -->
+      <!-- Post-hero content: gradient from hero blue down to deep navy -->
+      <div class="bg-gradient-to-b from-[#3872a9] to-[#1a3d6b]">
+        <!-- Spacer for blank blue screen transition -->
         <div class="h-[30vh] w-full pointer-events-none"></div>
 
         <!-- Mission Stories Section -->
@@ -83,8 +84,9 @@ import MissionStories from "../components/MissionStories";
             </p>
           </div>
         </section>
+
+        <Footer />
       </div>
-      <Footer />
     </main>
     <script>
       import Lenis from 'lenis';
