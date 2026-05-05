@@ -56,6 +56,72 @@
   to { transform: translateY(0); }
 }
 
+@keyframes modal-appear {
+  from { opacity: 0; transform: scale(0.96) translateY(10px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
+
+@keyframes card-appear {
+  from { opacity: 0; scale: 0.82; }
+  to   { opacity: 1; scale: 1; }
+}
+
+.newspaper-card {
+  background: linear-gradient(135deg, #f2e0b0 0%, #e8d090 60%, #f0dca8 100%);
+  clip-path: polygon(
+    0% 2%, 2% 0%, 6% 1.5%, 12% 0%, 19% 1%, 27% 0%, 35% 1.5%, 44% 0%,
+    53% 1%, 62% 0%, 70% 1.5%, 78% 0%, 85% 1%, 92% 0%, 97% 1.5%, 100% 0%,
+    99% 8%, 100% 18%, 99% 28%, 100% 40%, 99% 52%, 100% 64%, 99% 76%, 100% 88%, 99% 97%, 100% 100%,
+    94% 99%, 86% 100%, 78% 98.5%, 70% 100%, 62% 99%, 54% 100%, 46% 98.5%,
+    38% 100%, 30% 99%, 22% 100%, 14% 98.5%, 6% 100%, 2% 99%, 0% 100%,
+    1% 90%, 0% 78%, 1% 66%, 0% 54%, 1% 42%, 0% 30%, 1% 18%
+  );
+  padding: 18px 16px 20px;
+  font-family: Georgia, 'Times New Roman', serif;
+  color: #1a1208;
+  box-shadow: 3px 4px 16px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  animation: card-appear 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  filter: saturate(0.92) contrast(1.03);
+  overflow: hidden;
+}
+
+.card-source {
+  font-size: 9px;
+  font-family: var(--font-satoshi, sans-serif);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--card-source-color, #5a4a30);
+  margin-bottom: 5px;
+  border-bottom: 1px solid var(--card-rule-color, #b09060);
+  padding-bottom: 4px;
+}
+
+.card-title {
+  font-size: 15px;
+  font-weight: bold;
+  line-height: 1.25;
+  margin-bottom: 6px;
+  color: var(--card-title-color, #0f0a04);
+}
+
+.card-tag {
+  display: inline-block;
+  font-size: 8px;
+  font-family: var(--font-satoshi, sans-serif);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--card-tag-color, #6b5030);
+  border: 1px solid var(--card-rule-color, #a08050);
+  padding: 1px 6px;
+  margin-bottom: 7px;
+}
+
+.card-body {
+  font-size: 11px;
+  line-height: 1.55;
+  color: var(--card-body-color, #2a1e0e);
+}
+
 html {
   scroll-behavior: smooth;
 }

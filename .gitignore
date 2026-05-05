@@ -25,3 +25,11 @@ pnpm-debug.log*
 .idea/
 .vercel
 # Vercel deployment artifacts
+
+# Playwright
+.playwright-mcp/
+playwright-report/
+test-results/
+
+# local screenshot artifacts
+/*.png

@@ -5,7 +5,7 @@ import WaitlistButton from "../components/WaitlistButton";
 import Navbar from "../components/Navbar.astro";
 import Footer from "../components/Footer.astro";
 import ScrollVideoBackground from "../components/ScrollVideoBackground";
-import MissionStories from "../components/MissionStories";
+import MissionNewsClippings from "../components/MissionNewsClippings";
 ---
 
 <html lang="en">
@@ -54,15 +54,18 @@ import MissionStories from "../components/MissionStories";
         </div>
       </div>
 
-      <!-- Post-hero content: gradient from hero blue down to deep navy -->
-      <div class="bg-gradient-to-b from-[#3872a9] to-[#1a3d6b]">
-        <!-- Spacer for blank blue screen transition -->
-        <div class="h-[30vh] w-full pointer-events-none"></div>
-
-        <!-- Mission Stories Section -->
-        <div id="mission" class="relative z-20">
-          <MissionStories client:load />
-        </div>
+      <div class="bg-black">
+        <!-- Mission Section -->
+        <MissionNewsClippings client:load />
+        <section id="mission" class="min-h-svh flex items-center justify-center px-4 md:px-10 py-24">
+          <div class="max-w-2xl w-full space-y-6 md:space-y-10">
+            <p class="font-satoshi text-xs font-semibold uppercase tracking-[0.2em] text-white/40">Our Mission</p>
+            <h2 class="text-4xl md:text-6xl font-serif">Safety for everyone, always within reach.</h2>
+            <p class="font-satoshi text-base md:text-lg leading-relaxed text-white/85">
+              Safety should feel simple, immediate, and available to everyone. Halo helps people feel secure and reach help fast when it matters most. We are building tools that turn vulnerable moments into protected ones.
+            </p>
+          </div>
+        </section>
 
         <!-- About Section -->
         <section id="about" class="min-h-[100svh] flex items-center justify-center px-4 md:px-10 py-20" style="background: transparent;">

@@ -1,196 +1,421 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const storiesCol1 = [
-  { source: "BBC News", title: "Late Night Commute", body: "A student walking home late at night found herself followed. With no one around, she had to think fast to get to safety...", link: "#" },
-  { source: "The Guardian", title: "Unsafe Streets", body: "Recent reports show a spike in anxiety among nighttime workers commuting in urban areas without adequate lighting...", link: "#" },
-  { source: "Local News", title: "Campus Alert", body: "University issues warning after series of incidents near the library. Students urged to use buddy system...", link: "#" },
+interface Incident {
+  id: number;
+  avatar: string;
+  source: string;
+  title: string;
+  body: string;
+  tag: string;
+}
+
+const incidents: Incident[] = [
+  {
+    id: 1,
+    avatar: '/media/avatars/halo1.webp',
+    source: 'BBC News',
+    title: 'Late Night Commute',
+    body: 'A student walking home late at night found herself followed. With her phone nearly dead and no one around, she had to think fast to reach safety.',
+    tag: 'Personal Safety',
+  },
+  {
+    id: 2,
+    avatar: '/media/avatars/halo2.webp',
+    source: 'The Guardian',
+    title: 'Unsafe Streets',
+    body: 'Reports show a steep rise in anxiety among nighttime workers commuting through urban areas with inadequate lighting and no visible security.',
+    tag: 'Urban Safety',
+  },
+  {
+    id: 3,
+    avatar: '/media/avatars/halo3.webp',
+    source: 'Local News',
+    title: 'Campus Alert',
+    body: 'A university issued warnings after a series of incidents near the library, urging students to walk in pairs and keep emergency contacts ready.',
+    tag: 'Campus Safety',
+  },
+  {
+    id: 4,
+    avatar: '/media/avatars/halo4.webp',
+    source: 'TechCrunch',
+    title: 'Safety Tech Gap',
+    body: 'Consumer devices have prioritized fitness tracking while neglecting the real need: a reliable, discreet way to signal distress in dangerous moments.',
+    tag: 'Technology',
+  },
+  {
+    id: 5,
+    avatar: '/media/avatars/halo5.webp',
+    source: 'NY Times',
+    title: 'Domestic Concerns',
+    body: 'Advocates are calling for tools built for those in unsafe home situations — ones that work without an open phone call or any visible signal.',
+    tag: 'Domestic Safety',
+  },
+  {
+    id: 6,
+    avatar: '/media/avatars/halo6.webp',
+    source: 'NPR',
+    title: 'Community Watch',
+    body: 'Neighborhood groups are adopting digital tools to collaboratively monitor streets and respond faster to safety incidents after dark.',
+    tag: 'Community',
+  },
+  {
+    id: 7,
+    avatar: '/media/avatars/halo7.webp',
+    source: 'Reuters',
+    title: 'Elderly Isolation',
+    body: 'Seniors living alone face heightened risk with no quick, reliable way to call for help during a fall or medical emergency at home.',
+    tag: 'Elder Safety',
+  },
+  {
+    id: 8,
+    avatar: '/media/avatars/halo8.webp',
+    source: 'AP News',
+    title: 'Night Shift Workers',
+    body: 'Hospital and service staff finishing after midnight report feeling exposed and unsupported during the final stretch of their commute home.',
+    tag: 'Workplace Safety',
+  },
+  {
+    id: 9,
+    avatar: '/media/avatars/halo9.webp',
+    source: 'ABC News',
+    title: 'Teen Safety',
+    body: 'Parents and teens alike feel the gap between digital check-ins and being genuinely secure in public spaces and on the way home from school.',
+    tag: 'Youth Safety',
+  },
+  {
+    id: 10,
+    avatar: '/media/avatars/halo10.webp',
+    source: 'CNN',
+    title: 'Trail Incidents',
+    body: 'Hikers and runners on popular trails describe feeling vulnerable in areas with poor cell coverage and no reliable way to summon emergency help.',
+    tag: 'Outdoor Safety',
+  },
+  {
+    id: 11,
+    avatar: '/media/avatars/halo11.webp',
+    source: 'Forbes',
+    title: 'Solo Travel Risk',
+    body: 'Solo travelers — especially women — navigate unfamiliar cities with little protection beyond local knowledge and the hope that nothing goes wrong.',
+    tag: 'Travel Safety',
+  },
 ];
 
-const storiesCol2 = [
-  { source: "TechCrunch", title: "Safety Tech", body: "How new wearable devices are changing the landscape of personal security for vulnerable populations...", link: "#" },
-  { source: "NY Times", title: "Domestic Concerns", body: "Advocates call for better discrete emergency tools for those in unsafe domestic situations who cannot make a call...", link: "#" },
-  { source: "NPR", title: "Community Watch", body: "Neighborhood groups are adopting new digital tools to keep their streets safer after dark...", link: "#" },
-];
+const INNER_COUNT = 5;
+const OUTER_COUNT = 6;
+const TAU = Math.PI * 2;
 
-const StoryCard = ({ story }: { story: any }) => (
-  <div className="w-[200px] md:w-[240px] lg:w-[260px] xl:w-[300px] flex-shrink-0 rounded-3xl bg-[#2b6496]/40 backdrop-blur-md border border-white/10 p-6 flex flex-col gap-4 text-white shadow-2xl mb-6 mx-auto relative overflow-hidden pointer-events-auto">
-    <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '8px 8px' }}></div>
-    <div className="relative z-10 flex flex-col h-full gap-4">
-      <h3 className="font-serif text-2xl font-bold tracking-wide">{story.source}</h3>
-      <div className="border-t border-dotted border-white/20 w-full" />
-      <h4 className="font-satoshi font-bold text-xl leading-tight">{story.title}</h4>
-      <p className="font-satoshi text-base text-gray-200 leading-relaxed line-clamp-4">{story.body}</p>
-      <div className="border-t border-dotted border-white/20 w-full mt-auto pt-4" />
-      <a href={story.link} className="font-satoshi text-sm font-medium hover:text-white/70 transition-colors inline-flex items-center gap-1">
-        Read full story ↗
-      </a>
-    </div>
-  </div>
-);
+interface Config {
+  innerRadius: number;
+  outerRadius: number;
+  yRatio: number;
+}
+
+function getConfig(): Config {
+  if (typeof window === 'undefined') return { innerRadius: 240, outerRadius: 390, yRatio: 1.0 };
+  const w = window.innerWidth;
+  if (w < 640)  return { innerRadius: 130, outerRadius: 200, yRatio: 0.5 };
+  if (w < 1024) return { innerRadius: 185, outerRadius: 295, yRatio: 0.85 };
+  return { innerRadius: 240, outerRadius: 390, yRatio: 1.0 };
+}
 
 export default function MissionStories() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const textRef = useRef<HTMLDivElement>(null);
-  const storiesContainerRef = useRef<HTMLDivElement>(null);
+  const [selected, setSelected] = useState<Incident | null>(null);
+  const [hoveredId, setHoveredId] = useState<number | null>(null);
 
+  const sectionRef        = useRef<HTMLElement>(null);
+  const textRef           = useRef<HTMLDivElement>(null);
+  const wrapperRefs       = useRef<(HTMLDivElement | null)[]>(Array(incidents.length).fill(null));
+  const hoveredRef        = useRef<number | null>(null);
+  const configRef         = useRef<Config>(getConfig());
+  const rafRef            = useRef<number>(0);
+  const avatarOrbitStarts = useRef<(number | null)[]>(Array(incidents.length).fill(null));
+  const innerOrbitTimer   = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const outerOrbitTimer   = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // ── Resize ──────────────────────────────────────────────────────────────────
   useEffect(() => {
-    let ctx: gsap.Context;
+    const onResize = () => { configRef.current = getConfig(); };
+    window.addEventListener('resize', onResize, { passive: true });
+    configRef.current = getConfig();
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
-    const initAnimation = () => {
-      setTimeout(() => {
-        if (ctx) ctx.revert();
+  // ── Continuous orbit (RAF) — per-avatar orbit start times ───────────────────
+  useEffect(() => {
+    const tick = (now: number) => {
+      const cfg = configRef.current;
 
-        const aboutSection = document.querySelector('#about');
+      incidents.forEach((incident, i) => {
+        const t0 = avatarOrbitStarts.current[i];
+        if (t0 === null) { return; }
 
-        ctx = gsap.context(() => {
-          // === TEXT: Line-by-line left-to-right reveal ===
-          const words = gsap.utils.toArray('.highlight-word', textRef.current) as HTMLElement[];
-          const containerTop = textRef.current!.getBoundingClientRect().top;
+        const el = wrapperRefs.current[i];
+        if (!el) return;
 
-          // Group words by visual line (round to nearest 4px for subpixel stability)
-          const lineMap = new Map<number, HTMLElement[]>();
-          words.forEach(word => {
-            const lineKey = Math.round((word.getBoundingClientRect().top - containerTop) / 4) * 4;
-            if (!lineMap.has(lineKey)) lineMap.set(lineKey, []);
-            lineMap.get(lineKey)!.push(word);
-          });
+        const t         = (now - t0) / 1000;
+        const isInner   = i < INNER_COUNT;
+        const ringIndex = isInner ? i : i - INNER_COUNT;
+        const total     = isInner ? INNER_COUNT : OUTER_COUNT;
+        const radius    = isInner ? cfg.innerRadius : cfg.outerRadius;
+        const period    = isInner ? 32 : 52;
+        const dir       = isInner ? 1 : -1;
+        const startAngle = (ringIndex / total) * TAU - Math.PI / 2;
+        const angle      = startAngle + dir * (t / period) * TAU;
+        const x          = Math.cos(angle) * radius;
+        const y          = Math.sin(angle) * radius * cfg.yRatio;
+        const depth      = (Math.sin(angle) + 1) / 2;
 
-          const lines = [...lineMap.entries()]
-            .sort(([a], [b]) => a - b)
-            .map(([_, lineWords]) => lineWords);
+        el.style.transform = `translate(calc(-50% + ${x.toFixed(1)}px), calc(-50% + ${y.toFixed(1)}px))`;
+        el.style.opacity   = (0.45 + 0.55 * depth).toFixed(2);
+        el.style.zIndex    = incident.id === hoveredRef.current ? '25' : String(Math.round(depth * 18));
+      });
 
-          const tl = gsap.timeline({
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: 'top 70%',
-              end: 'bottom 30%',
-              scrub: 1,
-              invalidateOnRefresh: true,
-            }
-          });
-
-          // Each line gets an equal slice of the timeline.
-          // Within each slice: stagger fills 60% (left-to-right), each word's fade fills 40%.
-          lines.forEach((lineWords, i) => {
-            const sliceStart = i / lines.length;
-            const sliceDuration = 1 / lines.length;
-
-            tl.fromTo(lineWords,
-              { color: 'rgba(255, 255, 255, 0.3)' },
-              {
-                color: 'rgba(255, 255, 255, 1)',
-                stagger: { amount: sliceDuration * 0.6, from: 'start' },
-                duration: sliceDuration * 0.4,
-                ease: 'none',
-              },
-              sliceStart
-            );
-          });
-
-          // === STORIES: CSS animation handles the loop; GSAP only controls visibility ===
-          // Fade in when mission enters view; fade out when scrolling back above mission
-          ScrollTrigger.create({
-            trigger: sectionRef.current,
-            start: 'top bottom',
-            onEnter: () => gsap.to(storiesContainerRef.current, { opacity: 1, duration: 0.6 }),
-            onLeaveBack: () => gsap.to(storiesContainerRef.current, { opacity: 0, duration: 0.6 }),
-          });
-
-          // Fade out when About section enters view; fade back in when scrolling back above it
-          ScrollTrigger.create({
-            trigger: aboutSection,
-            start: 'top bottom',
-            onEnter: () => gsap.to(storiesContainerRef.current, { opacity: 0, duration: 0.6 }),
-            onLeaveBack: () => gsap.to(storiesContainerRef.current, { opacity: 1, duration: 0.6 }),
-          });
-
-          ScrollTrigger.refresh();
-        }, sectionRef);
-      }, 50);
+      rafRef.current = requestAnimationFrame(tick);
     };
 
-    window.addEventListener('hero-pin-ready', initAnimation, { once: true });
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
 
-    const fallbackTimer = setTimeout(() => {
-      if (!ctx) initAnimation();
-    }, 500);
+  // ── 3-phase pinned scroll animation ─────────────────────────────────────────
+  useEffect(() => {
+    const cfg = configRef.current;
+
+    const makeProxy = (i: number) => {
+      const isInner    = i < INNER_COUNT;
+      const ringIndex  = isInner ? i : i - INNER_COUNT;
+      const total      = isInner ? INNER_COUNT : OUTER_COUNT;
+      const radius     = isInner ? cfg.innerRadius : cfg.outerRadius;
+      const startAngle = (ringIndex / total) * TAU - Math.PI / 2;
+      const startR     = radius * 3.2;
+      return {
+        x:  Math.cos(startAngle) * startR,
+        y:  Math.sin(startAngle) * startR,
+        op: 0,
+        tx: Math.cos(startAngle) * radius,
+        ty: Math.sin(startAngle) * radius * cfg.yRatio,
+        to: 0.45 + 0.55 * ((Math.sin(startAngle) + 1) / 2),
+        el: wrapperRefs.current[i]!,
+        i,
+      };
+    };
+
+    const buildRingTl = (indices: number[]) => {
+      const proxies = indices.map(makeProxy);
+      const tl = gsap.timeline({ paused: true });
+      proxies.forEach((p, idx) => {
+        if (!p.el) return;
+        tl.to(p, {
+          x: p.tx, y: p.ty, op: p.to,
+          duration: 1.2,
+          ease: 'power3.out',
+          onUpdate() {
+            if (avatarOrbitStarts.current[p.i] !== null) return;
+            p.el.style.transform = `translate(calc(-50% + ${p.x.toFixed(1)}px), calc(-50% + ${p.y.toFixed(1)}px))`;
+            p.el.style.opacity   = p.op.toFixed(2);
+          },
+        }, idx * 0.1);
+      });
+      return tl;
+    };
+
+    // 1. Set initial state
+    incidents.forEach((_, i) => {
+      const el = wrapperRefs.current[i];
+      if (!el) return;
+      const p = makeProxy(i);
+      el.style.transform = `translate(calc(-50% + ${p.x.toFixed(1)}px), calc(-50% + ${p.y.toFixed(1)}px))`;
+      el.style.opacity = '0';
+      el.style.zIndex  = '0';
+    });
+    gsap.set(textRef.current, { opacity: 0, y: 24 });
+
+    const innerIndices = Array.from({ length: INNER_COUNT }, (_, i) => i);
+    const outerIndices = Array.from({ length: OUTER_COUNT }, (_, i) => i + INNER_COUNT);
+
+    const innerTl = buildRingTl(innerIndices);
+    const outerTl = buildRingTl(outerIndices);
+
+    // 2. Master timeline: inner ring → outer ring → text
+    const masterTl = gsap.timeline({ paused: true });
+    masterTl.add(innerTl, 0);
+    masterTl.add(outerTl, '>0.2');
+    masterTl.to(textRef.current, {
+      opacity: 1, y: 0, duration: 0.8, ease: 'power2.out',
+    }, '>0.3');
+
+    // Phase thresholds as fractions of total masterTl duration
+    const totalDur      = masterTl.duration();
+    const innerThresh   = innerTl.duration() / totalDur;
+    const outerThresh   = (innerTl.duration() + 0.2 + outerTl.duration()) / totalDur;
+
+    const startInnerOrbit = () => {
+      if (innerOrbitTimer.current !== null) return;
+      innerOrbitTimer.current = setTimeout(() => {
+        innerOrbitTimer.current = null;
+        const now = performance.now();
+        innerIndices.forEach(i => { if (avatarOrbitStarts.current[i] === null) avatarOrbitStarts.current[i] = now; });
+      }, 1100);
+    };
+
+    const stopInnerOrbit = () => {
+      if (innerOrbitTimer.current !== null) { clearTimeout(innerOrbitTimer.current); innerOrbitTimer.current = null; }
+      innerIndices.forEach(i => { avatarOrbitStarts.current[i] = null; });
+    };
+
+    const startOuterOrbit = () => {
+      if (outerOrbitTimer.current !== null) return;
+      outerOrbitTimer.current = setTimeout(() => {
+        outerOrbitTimer.current = null;
+        const now = performance.now();
+        outerIndices.forEach(i => { if (avatarOrbitStarts.current[i] === null) avatarOrbitStarts.current[i] = now; });
+      }, 1100);
+    };
+
+    const stopOuterOrbit = () => {
+      if (outerOrbitTimer.current !== null) { clearTimeout(outerOrbitTimer.current); outerOrbitTimer.current = null; }
+      outerIndices.forEach(i => { avatarOrbitStarts.current[i] = null; });
+    };
+
+    // 3. Pin section; onUpdate manages orbit start/stop for both scroll directions
+    const ctx = gsap.context(() => {
+      ScrollTrigger.create({
+        trigger:   sectionRef.current,
+        start:     'top top',
+        end:       '+=220%',
+        pin:       true,
+        scrub:     1,
+        animation: masterTl,
+        onUpdate(self) {
+          const p = self.progress;
+          if (p >= innerThresh) { startInnerOrbit(); } else { stopInnerOrbit(); }
+          if (p >= outerThresh) { startOuterOrbit(); } else { stopOuterOrbit(); }
+        },
+      });
+    }, sectionRef);
 
     return () => {
-      window.removeEventListener('hero-pin-ready', initAnimation);
-      clearTimeout(fallbackTimer);
-      if (ctx) ctx.revert();
+      ctx.revert();
+      stopInnerOrbit();
+      stopOuterOrbit();
     };
   }, []);
 
-  const missionParagraphs = [
-    "We believe safety should not be a luxury or something you have to worry about when you are just trying to live your life.",
-    "Our mission is simple: give people the tools they need to feel secure and get help fast when it matters most.",
-    "Whether someone is walking home alone, in an unsafe relationship, or facing any threat to their wellbeing, they deserve more than just hoping for the best.",
-    "We are building Halo to bridge that gap between feeling vulnerable and feeling protected.",
-    "Real safety features that work when you need them, designed by people who understand what it is like to feel unsafe.",
-    "Everyone should be able to move through the world with confidence, knowing that help is always within reach."
-  ];
+  // ── Scroll-lock when modal open ──────────────────────────────────────────────
+  useEffect(() => {
+    document.body.style.overflow = selected ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [selected]);
 
   return (
-    <section ref={sectionRef} className="relative w-full min-h-[100svh] py-20 md:py-32 border-y border-transparent flex items-center justify-center">
+    <section ref={sectionRef} className="relative w-full min-h-[100svh] flex items-center justify-center overflow-hidden">
 
-      {/* Story columns fixed to the full viewport — CSS animation drives the infinite loop */}
+      {/* Center text — starts invisible, fades in after more scrolling */}
       <div
-        ref={storiesContainerRef}
-        className="fixed inset-0 flex justify-between items-start w-full px-2 md:px-4 lg:px-8 pointer-events-none overflow-hidden z-[5]"
-        style={{
-          opacity: 0,
-          maskImage: 'linear-gradient(to bottom, transparent, black 10%, black 90%, transparent)',
-          WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 10%, black 90%, transparent)',
-        }}
+        ref={textRef}
+        className="relative z-10 text-center px-6 max-w-[260px] sm:max-w-xs mx-auto space-y-3 pointer-events-none select-none"
       >
-        {/* Left column — loops every 16s */}
-        <div
-          className="hidden sm:flex flex-col gap-6 flex-shrink-0"
-          style={{ animation: 'scrollUpThird 16s linear infinite' }}
-        >
-          {[...storiesCol1, ...storiesCol1, ...storiesCol1].map((story, i) => (
-            <StoryCard key={`l-${i}`} story={story} />
-          ))}
-        </div>
-
-        {/* Right column — loops every 22s, offset by half a cycle so they're out of phase */}
-        <div
-          className="hidden sm:flex flex-col gap-6 flex-shrink-0"
-          style={{ animation: 'scrollDownThird 22s linear infinite -11s' }}
-        >
-          {[...storiesCol2, ...storiesCol2, ...storiesCol2].map((story, i) => (
-            <StoryCard key={`r-${i}`} story={story} />
-          ))}
-        </div>
+        <p className="font-satoshi text-[10px] sm:text-xs font-semibold uppercase tracking-[0.2em] text-white/40">
+          Our Mission
+        </p>
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif text-white leading-snug">
+          Safety for everyone,<br />always within reach.
+        </h2>
+        <p className="font-satoshi text-xs sm:text-sm text-white/50 leading-relaxed">
+          Meet the people whose stories inspire everything we build.
+        </p>
       </div>
 
-      <div className="mx-auto px-4 w-full flex items-center justify-center relative z-20
-        max-w-[95%]
-        md:max-w-xl
-        lg:max-w-[calc(100vw-620px)]
-        xl:max-w-[calc(100vw-760px)]
-        2xl:max-w-[900px]
-      ">
-        <div className="flex flex-col justify-center items-center relative p-2 sm:p-6" ref={textRef}>
-          <div className="space-y-6 md:space-y-8 text-center">
-            <h2 className="text-4xl md:text-5xl xl:text-6xl font-serif text-white mb-6 md:mb-12">Our Mission</h2>
-            {missionParagraphs.map((text, i) => (
-              <p key={i} className="mission-paragraph font-satoshi text-xl md:text-2xl xl:text-3xl leading-relaxed font-medium">
-                {text.split(' ').map((word, j) => (
-                  <span key={`${i}-${j}`} className="highlight-word inline-block mr-1.5 text-white/30">
-                    {word}
-                  </span>
-                ))}
-              </p>
-            ))}
+      {/* Orbital avatar halo */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        {incidents.map((incident, i) => (
+          <div
+            key={incident.id}
+            ref={el => { wrapperRefs.current[i] = el; }}
+            className="absolute pointer-events-auto"
+            style={{ left: '50%', top: '50%', willChange: 'transform', opacity: 0 }}
+          >
+            <button
+              type="button"
+              className={[
+                'block transition-all duration-300',
+                'w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20',
+                i < INNER_COUNT ? 'lg:w-24 lg:h-24' : 'lg:w-20 lg:h-20',
+                hoveredId === incident.id ? 'scale-110 brightness-125' : '',
+              ].join(' ')}
+              onClick={() => setSelected(incident)}
+              onMouseEnter={() => { setHoveredId(incident.id); hoveredRef.current = incident.id; }}
+              onMouseLeave={() => { setHoveredId(null); hoveredRef.current = null; }}
+              aria-label={`View story: ${incident.title}`}
+            >
+              <img
+                src={incident.avatar}
+                alt=""
+                className="w-full h-full object-cover"
+                draggable={false}
+              />
+            </button>
+
+            {hoveredId === incident.id && (
+              <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 z-50 pointer-events-none whitespace-nowrap text-[10px] sm:text-xs font-satoshi font-medium text-white/90 bg-black/60 backdrop-blur-sm rounded-full px-3 py-1">
+                {incident.title}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Incident detail modal */}
+      {selected && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+          onClick={() => setSelected(null)}
+        >
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-xl" />
+          <div
+            className="relative z-10 w-full max-w-md bg-gradient-to-br from-[#1c4270] to-[#0d2240] border border-white/10 rounded-3xl p-7 sm:p-9 shadow-[0_0_80px_rgba(0,0,0,0.5)]"
+            style={{ animation: 'modal-appear 0.22s ease-out' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="absolute top-4 right-4 sm:top-5 sm:right-5 text-white/40 hover:text-white/90 transition-colors text-sm leading-none font-satoshi"
+              onClick={() => setSelected(null)}
+              aria-label="Close"
+            >
+              ✕
+            </button>
+
+            <div className="flex items-start gap-4 mb-5">
+              <img
+                src={selected.avatar}
+                alt=""
+                className="w-16 h-16 object-cover flex-shrink-0"
+              />
+              <div className="min-w-0">
+                <p className="font-satoshi text-[10px] font-semibold uppercase tracking-[0.15em] text-white/40 mb-0.5">
+                  {selected.source}
+                </p>
+                <h3 className="font-serif text-xl sm:text-2xl text-white leading-tight">
+                  {selected.title}
+                </h3>
+              </div>
+            </div>
+
+            <span className="inline-flex items-center text-[11px] font-satoshi font-medium text-white/60 bg-white/10 border border-white/10 rounded-full px-3 py-1 mb-5">
+              {selected.tag}
+            </span>
+
+            <p className="font-satoshi text-sm sm:text-base text-white/75 leading-relaxed">
+              {selected.body}
+            </p>
           </div>
         </div>
-      </div>
+      )}
     </section>
   );
 }

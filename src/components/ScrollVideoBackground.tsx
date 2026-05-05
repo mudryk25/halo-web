@@ -38,7 +38,7 @@ export default function ScrollVideoBackground() {
         scrollTrigger: {
           trigger: '#hero-section',
           start: 'top top',
-          end: '+=150%', // Ends exactly when the blue background finishes
+          end: '+=150%',
           scrub: 1, 
           pin: true,
           fastScrollEnd: true,
@@ -87,12 +87,12 @@ export default function ScrollVideoBackground() {
         0.8 // Trigger pushed to 0.8
       );
 
-      // 4. Solid pure blue sweeps in smoothly
+      // 4. Fade through black before the following section takes over.
       tl.fromTo(
         '#video-overlay',
         { backgroundColor: 'rgba(0, 0, 0, 0.2)' },
         {
-          backgroundColor: 'rgba(56, 114, 169, 1)', 
+          backgroundColor: 'rgba(0, 0, 0, 1)',
           duration: 0.2,
           ease: 'power1.inOut',
         },
@@ -104,7 +104,7 @@ export default function ScrollVideoBackground() {
         'body',
         { backgroundColor: 'rgba(0, 0, 0, 1)' },
         {
-          backgroundColor: 'rgba(56, 114, 169, 1)',
+          backgroundColor: 'rgba(0, 0, 0, 1)',
           duration: 0.2,
           ease: 'power1.inOut',
         },
