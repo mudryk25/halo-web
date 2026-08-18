@@ -6,6 +6,7 @@ import Navbar from "../components/Navbar.astro";
 import Footer from "../components/Footer.astro";
 import ScrollVideoBackground from "../components/ScrollVideoBackground";
 import MissionNewsClippings from "../components/MissionNewsClippings";
+import MissionTextHighlight from "../components/MissionTextHighlight";
 import LoadingScreen from "../components/LoadingScreen";
 ---
 
@@ -28,23 +29,42 @@ import LoadingScreen from "../components/LoadingScreen";
       <Navbar />
 
       <!-- Hero CTA Section — no background so the video shows through -->
-      <div id="hero-section" class="h-svh w-full flex items-center justify-center px-4 md:px-10">
+      <div
+        id="hero-section"
+        class="h-svh w-full flex items-center justify-center px-4 md:px-10"
+      >
         <div id="hero-content" class="max-w-5xl w-full text-center space-y-16">
           <div class="space-y-6">
-            <h2 class="text-5xl md:text-[5.5rem] font-serif leading-[1.1] tracking-tight">
-              Because Your <br class="hidden md:block"/> Safety Matters
+            <h2
+              class="text-5xl md:text-[5.5rem] font-serif leading-[1.1] tracking-tight"
+            >
+              Because Your <br class="hidden md:block" /> Safety Matters
             </h2>
-            <p class="text-xl md:text-2xl text-white/60 font-light max-w-xl mx-auto leading-relaxed">
-              Giving you the confidence to move <br class="hidden md:block"/>
+            <p
+              class="text-xl md:text-2xl text-white/60 font-light max-w-xl mx-auto leading-relaxed"
+            >
+              Giving you the confidence to move <br class="hidden md:block" />
               through the world without hesitation.
             </p>
           </div>
 
           <div class="relative inline-flex items-center justify-center">
             <!-- Glowing layers hugging the borders -->
-            <div class="absolute -inset-[3px] rounded-xl bg-white/90 blur-md animate-pulse" style="animation-duration: 2s;"></div>
-            <div class="absolute -inset-[10px] rounded-xl bg-white/60 blur-xl animate-pulse" style="animation-duration: 3s; animation-delay: 0.5s;"></div>
-            <div class="absolute -inset-[20px] rounded-xl bg-white/30 blur-2xl animate-pulse" style="animation-duration: 4s; animation-delay: 1s;"></div>
+            <div
+              class="absolute -inset-[3px] rounded-xl bg-white/90 blur-md animate-pulse"
+              style="animation-duration: 2s;"
+            >
+            </div>
+            <div
+              class="absolute -inset-[10px] rounded-xl bg-white/60 blur-xl animate-pulse"
+              style="animation-duration: 3s; animation-delay: 0.5s;"
+            >
+            </div>
+            <div
+              class="absolute -inset-[20px] rounded-xl bg-white/30 blur-2xl animate-pulse"
+              style="animation-duration: 4s; animation-delay: 1s;"
+            >
+            </div>
 
             <WaitlistButton
               className="relative bg-white text-black py-4 px-10 text-lg md:text-xl font-bold rounded-xl shadow-[0_0_25px_rgba(255,255,255,0.8)] hover:shadow-[0_0_50px_rgba(255,255,255,1)] hover:scale-[1.03] active:scale-95 transition-all duration-300 font-serif inline-block cursor-pointer"
@@ -60,33 +80,51 @@ import LoadingScreen from "../components/LoadingScreen";
       <div class="bg-black">
         <!-- Mission Section -->
         <MissionNewsClippings client:load />
-        <section id="mission" class="min-h-svh flex items-center justify-center px-4 md:px-10 py-24">
+        <section
+          id="mission"
+          class="min-h-svh flex items-center justify-center px-4 md:px-10 py-24"
+        >
           <div class="max-w-2xl w-full space-y-6 md:space-y-10">
-            <p class="font-satoshi text-xs font-semibold uppercase tracking-[0.2em] text-white/40">Our Mission</p>
-            <h2 class="text-4xl md:text-6xl font-serif">Safety for everyone, always within reach.</h2>
-            <p class="font-satoshi text-base md:text-lg leading-relaxed text-white/85">
-              Safety should feel simple, immediate, and available to everyone. Halo helps people feel secure and reach help fast when it matters most. We are building tools that turn vulnerable moments into protected ones.
+            <p
+              class="font-satoshi text-xs font-semibold uppercase tracking-[0.2em] text-white/40"
+            >
+              Our Mission
             </p>
+            <h2 class="text-4xl md:text-6xl font-serif">
+              Safety for everyone, always within reach.
+            </h2>
+            <MissionTextHighlight client:load />
           </div>
         </section>
 
         <!-- About Section -->
-        <section id="about" class="min-h-[100svh] flex items-center justify-center px-4 md:px-10 py-20" style="background: transparent;">
+        <section
+          id="about"
+          class="min-h-[100svh] flex items-center justify-center px-4 md:px-10 py-20"
+          style="background: transparent;"
+        >
           <div class="space-y-6 md:space-y-10 max-w-2xl">
             <h2 class="text-4xl md:text-6xl font-serif">About Us</h2>
-            <p class="font-satoshi text-base md:text-lg leading-relaxed text-white/85">
-              We are Ananjan and Ritankar, two friends who decided we could not just
-              stand by while people we care about face real safety threats every day.
+            <p
+              class="font-satoshi text-base md:text-lg leading-relaxed text-white/85"
+            >
+              We are Ananjan and Ritankar, two friends who decided we could not
+              just stand by while people we care about face real safety threats
+              every day.
             </p>
-            <p class="font-satoshi text-base md:text-lg leading-relaxed text-white/85">
-              After hearing too many stories from friends and family about feeling
-              unsafe walking alone or being in dangerous situations without help,
-              we realized the tools out there were missing what people need in
-              critical moments.
+            <p
+              class="font-satoshi text-base md:text-lg leading-relaxed text-white/85"
+            >
+              After hearing too many stories from friends and family about
+              feeling unsafe walking alone or being in dangerous situations
+              without help, we realized the tools out there were missing what
+              people need in critical moments.
             </p>
-            <p class="font-satoshi text-base md:text-lg leading-relaxed text-white/85">
-              We are building Halo because everyone deserves to feel safe and have
-              real help when they need it.
+            <p
+              class="font-satoshi text-base md:text-lg leading-relaxed text-white/85"
+            >
+              We are building Halo because everyone deserves to feel safe and
+              have real help when they need it.
             </p>
           </div>
         </section>
@@ -95,21 +133,35 @@ import LoadingScreen from "../components/LoadingScreen";
       </div>
     </main>
     <script>
-      import Lenis from 'lenis';
-      import gsap from 'gsap';
-      import { ScrollTrigger } from 'gsap/ScrollTrigger';
+      import Lenis from "lenis";
+      import gsap from "gsap";
+      import { ScrollTrigger } from "gsap/ScrollTrigger";
 
       gsap.registerPlugin(ScrollTrigger);
 
       const lenis = new Lenis();
 
-      lenis.on('scroll', ScrollTrigger.update);
+      lenis.on("scroll", ScrollTrigger.update);
 
       gsap.ticker.add((time) => {
         lenis.raf(time * 1000);
       });
 
       gsap.ticker.lagSmoothing(0);
+
+      // Create the About pin ONLY after the mission pin spacer is in the DOM.
+      // Creating it earlier means GSAP measures the wrong document height and
+      // the pin fires too early (showing About while still in the mission phase).
+      window.addEventListener('mission-pin-ready', () => {
+        ScrollTrigger.create({
+          trigger: "#about",
+          start: "top top",
+          end: "+=400",
+          pin: true,
+          pinSpacing: true,
+          invalidateOnRefresh: true,
+        });
+      }, { once: true });
     </script>
   </body>
 </html>

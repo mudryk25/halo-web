@@ -44,9 +44,10 @@ export default function ScrollVideoBackground() {
           trigger: '#hero-section',
           start: 'top top',
           end: '+=150%',
-          scrub: 1, 
+          // scrub: true locks animation exactly to scroll position — no lag.
+          // The video itself still eases via the RAF lerp, so it stays smooth.
+          scrub: true,
           pin: true,
-          fastScrollEnd: true,
           invalidateOnRefresh: true,
           onUpdate: (self) => {
             const isDissolved = self.progress > 0.8; // Adjusted progress scale
@@ -79,41 +80,31 @@ export default function ScrollVideoBackground() {
         0 
       );
 
-      // 3. Text Hold & Dissolve
+      // 3. Text Hold & Dissolve — starts at 0.65, gone by 0.85
       tl.fromTo(
         '#hero-content',
         { opacity: 1 },
         {
           opacity: 0,
           duration: 0.2,
-          ease: 'power2.inOut',
+          ease: 'power2.in',
           force3D: true,
         },
-        0.8 // Trigger pushed to 0.8
+        0.65
       );
 
-      // 4. Fade through black before the following section takes over.
+      // 4. Black overlay — starts building at 0.6, full black by 1.0
+      //    Starting earlier ensures the hero is fully hidden before the
+      //    pin releases, no matter how fast the user scrolls.
       tl.fromTo(
         '#video-overlay',
-        { backgroundColor: 'rgba(0, 0, 0, 0.2)' },
+        { backgroundColor: 'rgba(0, 0, 0, 0.0)' },
         {
           backgroundColor: 'rgba(0, 0, 0, 1)',
-          duration: 0.2,
-          ease: 'power1.inOut',
+          duration: 0.4,
+          ease: 'power2.in',
         },
-        0.8 // Ends at 1.0 exactly
-      );
-
-      // 5. Also fade the document body
-      tl.fromTo(
-        'body',
-        { backgroundColor: 'rgba(0, 0, 0, 1)' },
-        {
-          backgroundColor: 'rgba(0, 0, 0, 1)',
-          duration: 0.2,
-          ease: 'power1.inOut',
-        },
-        0.8 // Ends at 1.0 exactly
+        0.6
       );
 
       tween = tl;

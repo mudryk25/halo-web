@@ -87,11 +87,9 @@ const papers = [
 export default function MissionNewsClippings() {
   const [visibleCount, setVisibleCount] = useState(0);
   const [decodedCount, setDecodedCount] = useState(0);
-  const [overlayOpacity, setOverlayOpacity] = useState(1);
   const [mounted, setMounted] = useState(false);
   const visibleCountRef = useRef(0);
   const decodedCountRef = useRef(0);
-  const overlayOpacityRef = useRef(1);
 
   useEffect(() => {
     let trigger: ScrollTrigger | null = null;
@@ -154,38 +152,39 @@ export default function MissionNewsClippings() {
       preloadThrough(12);
       setMounted(true);
 
-      const revealDistance = clippings.length * 135;
-      const fadeDistance = 620;
-      const revealProgressEnd = revealDistance / (revealDistance + fadeDistance);
+      // Pin lasts exactly as long as it takes to reveal all clippings.
+      // After the pin releases, #mission (and the absolutely-positioned
+      // clippings inside it) scroll naturally with the page — no exit
+      // animation needed; the clippings just ride the section upward.
+      const revealDistance = clippings.length * 80;
 
       trigger = ScrollTrigger.create({
         id: 'mission-clippings',
         trigger: '#mission',
         start: 'top top',
-        end: `+=${revealDistance + fadeDistance}`,
+        end: `+=${revealDistance}`,
         pin: true,
         onUpdate(self) {
-          const revealProgress = Math.min(self.progress / revealProgressEnd, 1);
-          const target = Math.min(clippings.length, Math.ceil(revealProgress * clippings.length));
+          const target = Math.min(
+            clippings.length,
+            Math.ceil(self.progress * clippings.length),
+          );
 
           if (target !== visibleCountRef.current) {
             visibleCountRef.current = target;
             preloadThrough(target + 10);
             setVisibleCount(target);
           }
-
-          const fadeProgress = Math.max(0, (self.progress - revealProgressEnd) / (1 - revealProgressEnd));
-          const nextOpacity = 1 - fadeProgress;
-
-          if (Math.abs(nextOpacity - overlayOpacityRef.current) > 0.01) {
-            overlayOpacityRef.current = nextOpacity;
-            setOverlayOpacity(nextOpacity);
-          }
         },
       });
 
       // Refresh after the mission pin is added, with the hero pin already measured.
       ScrollTrigger.refresh();
+
+      // Set the flag before dispatching so late-mounting components
+      // can check it synchronously and avoid the race condition.
+      (window as any).__haloMissionPinReady = true;
+      window.dispatchEvent(new CustomEvent('mission-pin-ready'));
     };
 
     if ((window as any).__haloHeroPinReady) {
@@ -206,10 +205,18 @@ export default function MissionNewsClippings() {
 
   if (!mounted) return null;
 
+  // Portal into #mission so the clippings are absolute children of the section.
+  // During the GSAP pin, #mission is position:fixed so the absolute clippings
+  // cover the full viewport — identical to the old body portal.
+  // After the pin releases, #mission flows normally and the clippings ride up
+  // with it, keeping the mission text hidden as the user scrolls to About.
+  const missionEl = document.getElementById('mission');
+  if (!missionEl) return null;
+
   return createPortal(
     <div
-      className="fixed inset-0 pointer-events-none"
-      style={{ zIndex: 60, opacity: overlayOpacity }}
+      className="absolute inset-0 pointer-events-none"
+      style={{ zIndex: 10 }}
       aria-hidden="true"
     >
       {clippings.slice(0, Math.min(visibleCount, decodedCount)).map((clipping, i) => {
@@ -259,6 +266,6 @@ export default function MissionNewsClippings() {
         );
       })}
     </div>,
-    document.body,
+    missionEl,
   );
 }
